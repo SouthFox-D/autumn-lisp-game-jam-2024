@@ -166,24 +166,28 @@
   `(pre ,(string-join ink-script "\n")))
 
 
-(define (sub-string-list string-list start len part)
-  (if (string? (car string-list))
-      (if (> (string-length (car string-list)) start)
-          (append part
-                  (list (substring (car string-list) 0 start)
-                        (substring (car string-list) start (+ start len)))
-                  (if (= (+ start len) (string-length (car string-list)))
-                      '()
-                      (list (substring (car string-list) (+ start len) (string-length (car string-list)))))
-                  (cdr string-list))
-          (sub-string-list (cdr string-list)
-                     (- start (string-length (car string-list)))
-                     len
-                     (append part (list (car string-list)))))
-      (sub-string-list (cdr string-list)
-                 (- start (string-length (car (last-pair (car string-list)))))
-                 len
-                 (append part (list (car string-list))))))
+(define (sub-string-list string-list start len)
+  (define (sub-string-list-iter string-list start len part)
+    (if (string? (car string-list))
+        (if (> (string-length (car string-list)) start)
+            (append part
+                    (if (= start 0 )
+                        '()
+                        (substring (car string-list) 0 start))
+                    (list (substring (car string-list) start (+ start len)))
+                    (if (= (+ start len) (string-length (car string-list)))
+                        '()
+                        (list (substring (car string-list) (+ start len) (string-length (car string-list)))))
+                    (cdr string-list))
+            (sub-string-list-iter (cdr string-list)
+                                  (- start (string-length (car string-list)))
+                                  len
+                                  (append part (list (car string-list)))))
+        (sub-string-list-iter (cdr string-list)
+                              (- start (string-length (car (last-pair (car string-list)))))
+                              len
+                              (append part (list (car string-list))))))
+  (sub-string-list-iter string-list start len '()))
 
 ;; Main
 (set! *template* template-task)
