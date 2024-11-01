@@ -165,7 +165,7 @@
                        ))
   `(pre ,(string-join ink-script "\n")))
 
-
+;; Lib
 (define (sub-string-list string-list start len)
   (define (sub-string-list-iter string-list start len part)
     (if (string? (car string-list))
@@ -188,6 +188,15 @@
                               len
                               (append part (list (car string-list))))))
   (sub-string-list-iter string-list start len '()))
+
+(define (find-string-list-len string-list)
+  (define (find-string-list-len-iter string-list offset)
+    (if (string? (car string-list))
+        (if (string-index (car string-list) #\newline)
+            (+ (string-index (car string-list) #\newline) offset)
+            (find-string-list-len-iter (cdr string-list) (+ (string-length (car string-list)) offset)))
+        (find-string-list-len-iter (cdr string-list) (+ (string-length (car (last-pair (car string-list)))) offset) )))
+  (find-string-list-len-iter string-list 0))
 
 ;; Main
 (set! *template* template-task)
