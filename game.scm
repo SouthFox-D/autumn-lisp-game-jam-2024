@@ -166,15 +166,15 @@
   `(pre ,(string-join ink-script "\n")))
 
 ;; Lib
-(define (sub-string-list string-list start len)
-  (define (sub-string-list-iter string-list start len part)
+(define (sub-string-list string-list start len func)
+  (define (sub-string-list-iter string-list start len func part)
     (if (string? (car string-list))
         (if (> (string-length (car string-list)) start)
             (append part
                     (if (= start 0 )
                         '()
                         (substring (car string-list) 0 start))
-                    (list (substring (car string-list) start (+ start len)))
+                    (list (func (substring (car string-list) start (+ start len))))
                     (if (= (+ start len) (string-length (car string-list)))
                         '()
                         (list (substring (car string-list) (+ start len) (string-length (car string-list)))))
@@ -182,12 +182,14 @@
             (sub-string-list-iter (cdr string-list)
                                   (- start (string-length (car string-list)))
                                   len
+                                  func
                                   (append part (list (car string-list)))))
         (sub-string-list-iter (cdr string-list)
                               (- start (string-length (car (last-pair (car string-list)))))
                               len
+                              func
                               (append part (list (car string-list))))))
-  (sub-string-list-iter string-list start len '()))
+  (sub-string-list-iter string-list start len func '()))
 
 (define (find-string-list-len string-list)
   (define (find-string-list-len-iter string-list offset)
