@@ -198,20 +198,21 @@
         (find-string-list-len-iter (cdr string-list) (+ (string-length (car (last-pair (car string-list)))) offset) )))
   (find-string-list-len-iter string-list 0))
 
-(define (gen-update-list string-length x y len)
-  (define (up-iter string-length x y llen part)
+(define (gen-update-list string-length x y xlen ylen)
+  (define (up-iter string-length x y xlen llen part)
     (if (= 0 llen)
         part
         (up-iter string-length
                    x
                    (+ 1 y)
+                   xlen
                    (- llen 1)
                    (append part
                            (list (list
                                   (+ (* y string-length) x )
-                                  (+ len (+ (* y string-length) x))
+                                  (+ xlen (+ (* y string-length) x))
                                   ))))))
-  (up-iter (+ 1 string-length) x y len '()))
+  (up-iter (+ 1 string-length) x y xlen ylen '()))
 
 ;; Main
 (set! *template* template-task)
