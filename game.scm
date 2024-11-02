@@ -173,7 +173,7 @@
             (append part
                     (if (= start 0 )
                         '()
-                        (substring (car string-list) 0 start))
+                        (list (substring (car string-list) 0 start)))
                     (list (func (substring (car string-list) start (+ start len))))
                     (if (= (+ start len) (string-length (car string-list)))
                         '()
