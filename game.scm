@@ -151,20 +151,6 @@
             "Add task")))
 
 
-;; render ascii art
-(define (template-ascii-art)
-  (define ink-script '(
-                       "(\\                         "
-                       "\\'\\                        "
-                       " \\'\\     __________        "
-                       " / '|   ()_________)       "
-                       " \\ '/    \\ ~~~~~~~~ \\      "
-                       "   \\       \\ ~~~~~~   \\    "
-                       "   ==).      \\__________\\  "
-                       "  (__)       ()__________) "
-                       ))
-  `(pre ,(string-join ink-script "\n")))
-
 ;; Lib
 (define (sub-string-list string-list start len func)
   (define (sub-string-list-iter string-list start len func part)
@@ -174,19 +160,19 @@
                     (if (= start 0 )
                         '()
                         (list (substring (car string-list) 0 start)))
-                    (list (func (substring (car string-list) start (+ start len))))
-                    (if (= (+ start len) (string-length (car string-list)))
+                    (list (func (substring (car string-list) start len)))
+                    (if (= len (string-length (car string-list)))
                         '()
-                        (list (substring (car string-list) (+ start len) (string-length (car string-list)))))
+                        (list (substring (car string-list) start (string-length (car string-list)))))
                     (cdr string-list))
             (sub-string-list-iter (cdr string-list)
-                                  (- start (string-length (car string-list)))
-                                  len
+                                  (abs (- start (string-length (car string-list))))
+                                  (abs (- len (string-length (car string-list))))
                                   func
                                   (append part (list (car string-list)))))
         (sub-string-list-iter (cdr string-list)
                               (- start (string-length (car (last-pair (car string-list)))))
-                              len
+                              (- len (string-length (car (last-pair (car string-list)))))
                               func
                               (append part (list (car string-list))))))
   (sub-string-list-iter string-list start len func '()))
@@ -205,7 +191,7 @@
     (if (= 0 llen)
         part
         (up-iter string-length
-                   x
+                   (+ x xlen)
                    (+ 1 y)
                    xlen
                    (- llen 1)
@@ -215,6 +201,38 @@
                                   (+ xlen (+ (* y string-length) x))
                                   ))))))
   (up-iter (+ 1 string-length) x y xlen ylen '()))
+
+(define (gen-string-list string-list update-list func)
+  (let loop ((string-list string-list)
+             (update-list update-list))
+    (if (equal? update-list '())
+        string-list
+        (loop (sub-string-list string-list
+                               (car (car update-list))
+                               (cadr (car update-list))
+                               func)
+              (cdr update-list)))))
+
+;; render ascii art
+(define (template-ascii-art)
+  (define (blod string)
+    `(b ,string))
+  (define ink-script '(
+                       "(\\                         "
+                       "\\'\\                        "
+                       " \\'\\     __________        "
+                       " / '|   ()_________)       "
+                       " \\ '/    \\ ~~~~~~~~ \\      "
+                       "   \\       \\ ~~~~~~   \\    "
+                       "   ==).      \\__________\\  "
+                       "  (__)       ()__________) "
+                       ))
+  (string-length (string-join ink-script "\n"))
+  `(pre ,@(gen-string-list (list (string-join ink-script "\n"))
+          (gen-update-list
+           (find-string-list-len (list (string-join ink-script "\n"))) 3 1 1 5)
+          blod)))
+
 
 ;; Main
 (set! *template* template-task)
