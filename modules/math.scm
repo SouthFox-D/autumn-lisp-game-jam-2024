@@ -22,11 +22,11 @@
   #:pure
   #:use-module (scheme base)
   #:use-module (hoot ffi)
-  #:export (random clamp))
+  #:export (random-int clamp))
 
-(define-foreign random
-  "math" "random"
-  -> f64)
+(define-foreign random-int
+  "math" "randomInt"
+  i32 -> i32)
 
 (define (clamp x min max)
   (cond ((< x min) min)
