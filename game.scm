@@ -150,7 +150,6 @@
                              (render))))))
             "Add task")))
 
-
 ;; Lib
 (define (sub-string-list string-list start len func)
   (define (sub-string-list-iter string-list start len func part)
@@ -163,7 +162,7 @@
                     (list (func (substring (car string-list) start len)))
                     (if (= len (string-length (car string-list)))
                         '()
-                        (list (substring (car string-list) start (string-length (car string-list)))))
+                        (list (substring (car string-list) len (string-length (car string-list)))))
                     (cdr string-list))
             (sub-string-list-iter (cdr string-list)
                                   (abs (- start (string-length (car string-list))))
@@ -181,7 +180,7 @@
   (define (find-string-list-len-iter string-list offset)
     (if (string? (car string-list))
         (if (string-index (car string-list) #\newline)
-            (+ (string-index (car string-list) #\newline) offset)
+            (+ (string-index (car string-list) #\newline) offset 1)
             (find-string-list-len-iter (cdr string-list) (+ (string-length (car string-list)) offset)))
         (find-string-list-len-iter (cdr string-list) (+ (string-length (car (last-pair (car string-list)))) offset) )))
   (find-string-list-len-iter string-list 0))
@@ -191,7 +190,7 @@
     (if (= 0 llen)
         part
         (up-iter string-length
-                   (+ x xlen)
+                   x
                    (+ 1 y)
                    xlen
                    (- llen 1)
@@ -200,7 +199,7 @@
                                   (+ (* y string-length) x )
                                   (+ xlen (+ (* y string-length) x))
                                   ))))))
-  (up-iter (+ 1 string-length) x y xlen ylen '()))
+  (up-iter string-length x y xlen ylen '()))
 
 (define (gen-string-list string-list update-list func)
   (let loop ((string-list string-list)
@@ -227,12 +226,10 @@
                        "   ==).      \\__________\\  "
                        "  (__)       ()__________) "
                        ))
-  (string-length (string-join ink-script "\n"))
   `(pre ,@(gen-string-list (list (string-join ink-script "\n"))
           (gen-update-list
-           (find-string-list-len (list (string-join ink-script "\n"))) 3 1 1 5)
+           (find-string-list-len (list (string-join ink-script "\n"))) 1 1 10 5)
           blod)))
-
 
 ;; Main
 (set! *template* template-task)
